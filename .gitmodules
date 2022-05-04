@@ -1,0 +1,3 @@
+[submodule "exa"]
+	path = exa
+	url = https://github.com/ogham/exa
