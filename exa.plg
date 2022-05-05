@@ -49,7 +49,7 @@ echo "*** Removing exa ***"
 # Remove plugin related files
 removepkg &name;-&version;
 
-rm -rf /usr/local/emhttp/plugins/&name;
+rm -rf &emhttp;
 rm -rf &plugin;
 
 echo
