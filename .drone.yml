@@ -9,6 +9,9 @@ trigger:
 concurrency:
   limit: 1
 
+workspace:
+  path: /drone/src
+
 steps:
   - name: checkout submodule
     image: alpine/git
@@ -20,18 +23,25 @@ steps:
       - cd exa
       - git fetch --all --tags
       - git checkout tags/${DRONE_TAG}
+    depends_on:
+      - "checkout submodule"
   - name: cargo build
     image: rust:latest
     commands:
       - cd exa
       - cargo build --release --target x86_64-unknown-linux-gnu
       - cd target/x86_64-unknown-linux-gnu/release
+    depends_on:
+      - "checkout tag"
   - name: verify
     image: rust:latest
     commands:
-      - exa/target/x86_64-unknown-linux-gnu/release/exa --long
-      - lines=$(exa/target/x86_64-unknown-linux-gnu/release/exa --long | wc -l)
-      - if test $lines -ne 5; then exit 1; fi
+      - mkdir /tmp/verify && cd /tmp/verify && touch verify
+      - /drone/src/exa/target/x86_64-unknown-linux-gnu/release/exa --long
+      - lines=$(/drone/src/exa/target/x86_64-unknown-linux-gnu/release/exa --long | wc -l)
+      - if test $lines -ne 1; then exit 1; fi
+    depends_on:
+      - "cargo build"
   - name: build slackware package
     image: vbatts/slackware:14.2
     commands:
@@ -40,12 +50,16 @@ steps:
       - cp -R ./usr ./dist
       - chmod +x ./dist/usr/sbin/exa
       - cd dist
-      - makepkg -l y -c y ../exa-${DRONE_TAG}.txz
+      - makepkg -l y -c y ../unraid-exa-${DRONE_TAG}.txz
+    depends_on:
+      - "verify"
   - name: prepare release
     image: vbatts/slackware:14.2
     commands:
       - echo "exa ${DRONE_TAG} - built@$(date '+%FT%TZ') [Drone ${DRONE_SYSTEM_VERSION}]" > ./release_note
       - cat ./release_note
+    depends_on:
+      - "build slackware package"
   - name: publish gitea release
     image: plugins/gitea-release
     settings:
@@ -53,7 +67,7 @@ steps:
         from_secret: GITEA_KEY
       base_url: https://git.panaetius.co.uk
       files:
-        - ./exa-${DRONE_TAG}.txz
+        - ./unraid-exa-${DRONE_TAG}.txz
       checksum:
         - md5
       title: ${DRONE_TAG}
@@ -61,13 +75,15 @@ steps:
       file_exists: "skip"
       when:
         event: tag
+    depends_on:
+      - "prepare release"
   - name: publish github release
     image: plugins/github-release
     settings:
       api_key:
         from_secret: GITHUB_KEY
       files:
-        - ./exa-${DRONE_TAG}.txz
+        - ./unraid-exa-${DRONE_TAG}.txz
       checksum:
         - md5
       title: ${DRONE_TAG}
@@ -75,7 +91,8 @@ steps:
       file_exists: "skip"
       when:
         event: tag
-
+    depends_on:
+      - "prepare release"
   - name: slack
     image: plugins/slack
     settings:
@@ -86,3 +103,6 @@ steps:
       status:
         - "success"
         - "failure"
+    depends_on:
+      - "publish gitea release"
+      - "publish github release"
