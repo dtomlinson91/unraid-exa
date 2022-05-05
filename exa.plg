@@ -7,7 +7,7 @@
   <!ENTITY gitURL     "https://git.panaetius.co.uk/&org;/&name;">
   <!ENTITY pluginURL  "&gitURL;/raw/branch/master/&name;.plg">
   <!ENTITY releaseURL "&gitURL;/releases/download/&version;/&name;-&version;.txz">
-  <!ENTITY md5        "06c8ef59e2f338d5e3eeed46c368967d">
+  <!ENTITY md5        "c1135c63c53dfbd72494bdab269240be">
   <!ENTITY plugin     "/boot/config/plugins/&name;">
   <!ENTITY emhttp     "/usr/local/emhttp/plugins/&name;">
 ]>
