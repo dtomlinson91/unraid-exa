@@ -23,7 +23,15 @@
 
 <FILE Run="/bin/bash">
 <INLINE>
-rm -f $(ls /boot/config/plugins/&name;/&name;*.txz 2>/dev/null | grep -v '&version;')
+<!-- remove previous version if present -->
+file=$(/usr/bin/ls /boot/config/plugins/&name;/&name;*.txz | grep -v '&version;')
+if [ ! -z "$file" ]
+then
+  filename=$(basename -- $file)
+  previous="${filename%.*}"
+  removepkg $previous
+  rm -f $file
+fi
 </INLINE>
 </FILE>
 
