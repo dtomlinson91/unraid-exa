@@ -29,8 +29,11 @@ if [ ! -z "$file" ]
 then
   filename=$(basename -- $file)
   previous="${filename%.*}"
+  echo "previous version ${previous} found - uninstalling"
   removepkg $previous
   rm -f $file
+else
+  echo "no previous version found - first time install"
 fi
 </INLINE>
 </FILE>
