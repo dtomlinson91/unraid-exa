@@ -2,7 +2,7 @@
 
 This is the repository for the exa unraid plugin.
 
-<img src="https://git.panaetius.co.uk/unraid-plugins/exa/raw/branch/master/exa.png"/>
+<img src="https://git.panaetius.co.uk/dtomlinson91/unraid-exa/raw/branch/master/assets/unraid-exa.png"/>
 
 ## description
 
