@@ -29,7 +29,9 @@ steps:
   - name: verify
     image: rust:latest
     commands:
-      - exa/target/x86_64-unknown-linux-gnu/release/exa --long --icons
+      - exa/target/x86_64-unknown-linux-gnu/release/exa --long
+      - lines=$(exa/target/x86_64-unknown-linux-gnu/release/exa --long | wc -l)
+      - if test $lines -ne 4; then exit 1; fi
   - name: build slackware package
     image: vbatts/slackware:14.2
     commands:
