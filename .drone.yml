@@ -85,7 +85,7 @@ steps:
       files:
         - ./unraid-exa-${DRONE_TAG}.txz
       base_url: https://github.com
-      upload_url: https://github.com
+      upload_url: https://github.com/dtomlinson91/unraid-exa/releases
       checksum:
         - md5
       title: ${DRONE_TAG}
